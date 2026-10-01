@@ -1,6 +1,5 @@
 package com.doubao.autoclicker;
 
-import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,14 +11,11 @@ import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -204,12 +200,15 @@ public class MainActivity extends Activity {
     }
 
     private boolean isAccessibilityEnabled() {
-        AccessibilityManager am = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
-        List<AccessibilityServiceInfo> list =
-                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-        ComponentName cn = new ComponentName(this, AutoClickService.class);
-        for (AccessibilityServiceInfo info : list) {
-            if (cn.equals(info.getComponentName())) {
+        // 通过系统设置中的已开启无障碍服务列表判断（跨版本稳定，不依赖 AccessibilityServiceInfo 的 API 变动）
+        String enabled = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (enabled == null || enabled.isEmpty()) {
+            return false;
+        }
+        String flat = new ComponentName(this, AutoClickService.class).flattenToString();
+        for (String s : enabled.split(":")) {
+            if (s.equalsIgnoreCase(flat)) {
                 return true;
             }
         }
