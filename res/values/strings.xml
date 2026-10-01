@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">自动连点器</string>
+    <string name="accessibility_description">用于模拟屏幕点击，实现自动连点功能。开启后请仅在你自己使用的应用内使用。</string>
+</resources>
